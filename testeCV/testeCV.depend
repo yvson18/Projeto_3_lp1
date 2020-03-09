@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1583590057 source:c:\users\migue\onedrive\Área de trabalho\universidade\roteiro 3\testecv\main.cpp
+	<iostream>
+	<opencv2\highgui\highgui.hpp>
+	<opencv2\opencv.hpp>
+	<vector>
+
+1583774022 source:c:\users\migue\onedrive\Área de trabalho\testecv\main.cpp
+	<iostream>
+	<opencv2\highgui\highgui.hpp>
+	<opencv2\opencv.hpp>
+	<vector>
+
