@@ -49,6 +49,7 @@ void loop(){
       if(WHITE_BUTTON.bounceless() == false){
         setPositionSteppMotor(digitalRead(BLACK_BUTTON),digitalRead(RED_BUTTON));
         digitalWrite(GREEN_LED,LOW);
+         s1.write(0);
         pastAngle = 90;
       }else{
          digitalWrite(GREEN_LED,HIGH);

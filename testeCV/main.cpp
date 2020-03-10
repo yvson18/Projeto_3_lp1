@@ -37,7 +37,7 @@ int main() {
         for(Rect area : faces){
 
             Scalar drawColor = Scalar(255,0,0);
-            rectangle(frame, Point(cvRound(area.x * scale), cvRound(area.y * scale)), Point(cvRound((area.x + area.width - 1)*scale), cvRound((area.y + area.height - 1)*scale)), drawColor);
+            rectangle(frame, Point(cvRound(area.x * scale), cvRound(area.y * scale)), Point(cvRound((area.x + area.width - 1)*scale), cvRound((area.y + area.height - 1)*scale)) drawColor);
             cout << "X = " << area.x << endl;
             cout << "Y = " << area.y << endl;
         }
