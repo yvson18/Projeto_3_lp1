@@ -1,15 +1,19 @@
 # depslib dependency file v1.0
-1583511714 source:c:\users\yvson\desktop\projetoventiladorcv\ventiladorcv\serialport.cpp
+1583775118 source:c:\users\yvson\desktop\projetoventiladorcv\ventiladorcv\serialport.cpp
 	"SerialPort.h"
 
-1583511714 c:\users\yvson\desktop\projetoventiladorcv\ventiladorcv\serialport.h
+1583775118 c:\users\yvson\desktop\projetoventiladorcv\ventiladorcv\serialport.h
 	<windows.h>
 	<stdio.h>
 	<stdlib.h>
 
-1583513678 source:c:\users\yvson\desktop\projetoventiladorcv\ventiladorcv\main.cpp
+1585491765 source:c:\users\yvson\desktop\projetoventiladorcv\ventiladorcv\main.cpp
 	<iostream>
+	<iomanip>
 	"SerialPort.h"
 	<string>
 	<string.h>
+	<opencv2\highgui\highgui.hpp>
+	<opencv2\opencv.hpp>
+	<vector>
 

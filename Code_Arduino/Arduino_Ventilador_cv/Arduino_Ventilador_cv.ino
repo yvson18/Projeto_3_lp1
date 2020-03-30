@@ -10,14 +10,15 @@
 #define RED_BUTTON 2
 #define BLACK_BUTTON 4
 
-#define GREEN_LED 5
+#define GREEN_LED 3
 
 short angS1, stepsPerRotation = 64,flag = 0;
 float pastAngle = 90;
+bool enable = true;
 
 Servo s1;
 Stepper sP1(stepsPerRotation,in1 ,in3 ,in2 ,in4);
-Debounce WHITE_BUTTON(3);
+Debounce WHITE_BUTTON(2);
 
 
 void setup(){
@@ -25,8 +26,8 @@ void setup(){
   Serial.begin(9600);
   
  // -------- Servo ----------- 
-  s1.attach(6);// assign the port
-  angS1 = 0;
+  s1.attach(4);// assign the port
+  angS1 = 90;
   s1.write(angS1);
   
 //------ Stepp motor --------
@@ -43,14 +44,13 @@ void setup(){
   pinMode(GREEN_LED,OUTPUT);// if it is off, means that you  can change the position of the motor
  
 }
-
 void loop(){
   
       if(WHITE_BUTTON.bounceless() == false){
         setPositionSteppMotor(digitalRead(BLACK_BUTTON),digitalRead(RED_BUTTON));
         digitalWrite(GREEN_LED,LOW);
-         s1.write(0);
-        pastAngle = 90;
+         s1.write(90);
+        
       }else{
          digitalWrite(GREEN_LED,HIGH);
             if(Serial.available() > 0 and WHITE_BUTTON.bounceless()== true){
@@ -60,7 +60,7 @@ void loop(){
 }
 
 void steppAngleMotion(float angle){
-
+   
    float currentAngle = angle; 
    float angleToSpin = (currentAngle - pastAngle)/360;
    short sense = 1;
@@ -79,6 +79,7 @@ void steppAngleMotion(float angle){
      for(int i  = 0; i < (32 * angleToSpin); i++){
         sP1.step(sense*stepsPerRotation);
       }
+      
 }
 
 
@@ -93,8 +94,10 @@ void setPositionSteppMotor(bool right,bool left){
 void mainControll(){
 
   String info; float anguloMotor, anguloServo;
-             info = Serial.readStringUntil('\n') + '\n';
-
+             if(enable){
+                info = Serial.readStringUntil('\n') + '\n'; 
+             }
+             
              const char* infoEmC = {info.c_str()};
              char anguloMotorString[4],anguloServoString[4];
              short spP = 0; 
@@ -122,13 +125,28 @@ void mainControll(){
              }
               
              anguloMotor = atof(anguloMotorString);
-             anguloServo = atof(anguloServoString);
+             anguloServo = atof(anguloMotorString);
             Serial.print("anguloServo: "); Serial.println(anguloServo);
-    
+
+              /*     
                if(anguloMotor > 0){ // aqui deixamos maior que zero por conta de uns bugs misteriosos
                 steppAngleMotion(anguloMotor);
                }
-                if(anguloServo > 0){// aqui deixamos maior que zero por conta de uns bugs misteriosos
-                s1.write(anguloServo);
+               */
+                static float valorPassado = 90, valorAtual = 90;
+                valorAtual = anguloServo;
+                //delay(500);             
+                float diferenca = abs(valorAtual - valorPassado);              
+                      
+               if(diferenca >= 10){  
+                     if(anguloServo < 0.1){
+                      //s1.write(0.1);
+                     }else if(anguloServo >= 0.1){// aqui deixamos maior que zero por conta de uns bugs misteriosos
+                      enable = false; 
+                      s1.write(anguloServo);
+                      enable = true;
+                     }
+                     valorPassado = valorAtual;
                }
+               
 }

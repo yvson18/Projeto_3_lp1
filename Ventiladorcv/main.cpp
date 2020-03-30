@@ -5,6 +5,7 @@
 
 */
 #include <iostream>
+#include <iomanip>
 #include "SerialPort.h"
 #include <string>
 #include <string.h>
@@ -23,6 +24,7 @@ char incoming[MAX_DATA_LENGTH];
 int main(){
 
     SerialPort arduino(port);
+    Rect retangulo;
 
     double scale = 2.0;
     CascadeClassifier faceCascade;
@@ -42,9 +44,24 @@ int main(){
 
 	const char* windowName = "Webcam Feed";
     namedWindow(windowName, WINDOW_AUTOSIZE);
+    double angulo_x, angulo_y, constante_magica_x, constante_magica_y;
+    double unidade_x, unidade_y, dummy_x, dummy_y;
+    double s;
+    retangulo = (getWindowImageRect("Webcam Feed"));
+    unidade_x = retangulo.width / 90.0;
+    unidade_y = retangulo.height / 22.5;
+    string coordenadaX = "90,0", coordenadaY = "0,0";
+    Point centro_janela(retangulo.x + (retangulo.width / 2), retangulo.y + (retangulo.height / 2));
+    constante_magica_x = retangulo.x;
+    constante_magica_y = retangulo.y;
 
+    cout << centro_janela.x << "\n" << centro_janela.y << endl;
+    cout << constante_magica_x << endl;
+    cout << constante_magica_y << endl;
+    cout << unidade_x << "," << unidade_y << endl;
+    cout<< "[" << retangulo.tl().x << "," << retangulo.tl().y << "]" <<  "[" << retangulo.br().x << "," << retangulo.br().y << "]" << endl;
 
-    while(arduino.isConnected()){ //  como n tera nenhum arduino contigo deixa isso while 1 para funcionar para os teus testes
+    while(1){ //  como n tera nenhum arduino contigo deixa isso while 1 para funcionar para os teus testes
 
         Mat frame;
 		bool bSuccess = cap.read(frame);
@@ -61,19 +78,23 @@ int main(){
             Scalar drawColor = Scalar(255,0,0);
             rectangle(frame, Point(cvRound(area.x * scale), cvRound(area.y * scale)), Point(cvRound((area.x + area.width - 1)*scale), cvRound((area.y + area.height - 1)*scale)), drawColor);
 
+            Point centro(scale * (area.x + (area.width / 2)) + constante_magica_x, scale * (area.y + (area.height / 2)) + constante_magica_y);
+            cout << "[" << centro.x << "," << centro.y << "]" << endl;
 
-            /*
-            Isaac, quando tu for fazer, tu so deve designar o valor convertido do angulo
-            para essas strings ae (coordx, coordy).
-            Ademais, observações complementares são:  tenta deixar tudo em uma faixa  de valores entre 0 e 180 e
-            alem disso , cuida para que se tenha uma faixa de tolerancia do tipo que se o usuario
-            se mover so um pouco n varie o input dos angulos que tu vai atribuir as coordx e coordy
-            pq se n vai ficar muito sensivel
-            */
 
-            string coordenadaX = to_string(area.x);
-            string coordenadaY = to_string(area.y);
-            string command = coordenadaY + " " + coordenadaX;
+
+            angulo_x = 90 - (centro.x - centro_janela.x) / unidade_x;
+            s = 5.625 -(centro.y - centro_janela.y)/unidade_y;
+            angulo_y = (s >= 0)? s : 0;
+
+
+
+                dummy_x = (int)angulo_x;
+                dummy_y = (int)angulo_y;
+                coordenadaX = to_string(dummy_x);
+                coordenadaY = to_string(dummy_y);
+
+            string command = coordenadaX + " " + coordenadaY;
 
             cout << command << endl;
 
@@ -82,8 +103,8 @@ int main(){
             copy(command.begin(),command.end(),charArray);
             charArray[command.size()] = '\n';
 
-            //arduino.writeSerialPort(charArray,MAX_DATA_LENGTH);
-            //arduino.readSerialPort(output,MAX_DATA_LENGTH);
+            arduino.writeSerialPort(charArray,MAX_DATA_LENGTH);
+            arduino.readSerialPort(output,MAX_DATA_LENGTH);
 
              delete charArray;
 
@@ -101,27 +122,6 @@ int main(){
                 return 0;
             }
         }
-
-
-        //string command;
-        //getline(std::cin,command);
-        //cout << command << endl;
-        //char *charArray = new char[command.size()+1];
-
-        //copy(command.begin(),command.end(),charArray);
-        //charArray[command.size()] = '\n';
-
-        //arduino.writeSerialPort(charArray,MAX_DATA_LENGTH);
-        //arduino.readSerialPort(output,MAX_DATA_LENGTH);
-
-        //cout << output;
-
-        //delete charArray;
-
-
-
-
-
 
     return 0;
 }
