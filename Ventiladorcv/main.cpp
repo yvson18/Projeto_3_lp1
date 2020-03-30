@@ -1,16 +1,21 @@
 /*
+    Programmers: Yvson Nunes
+                 Isaac Nobrega:
+                 Miguel Elias
 
-                        O QUE TA COMENTADO DO ARDUINO OU DE COISAS QUE TU ACHA QUE EH DO
-                        ARDUINO DEIXA ELAS COMENTADAS MSM MORO JO?
+    30/03/2020
 
 */
+
 #include <iostream>
 #include <iomanip>
 #include "SerialPort.h"
 #include <string>
 #include <string.h>
+#include <ctime>
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\opencv.hpp>
+#include <opencv2\core\types.hpp>
 #include <vector>
 
 using namespace std;
@@ -20,6 +25,18 @@ char output[MAX_DATA_LENGTH]; // recebe saidas do arduino
 char port[] = "\\\\.\\COM3";
 char incoming[MAX_DATA_LENGTH];
 
+bool envio(int flag, int flagAnterior, time_t timer, time_t *tempo)
+{
+    time(&timer);
+    *tempo = (flag != flagAnterior)? time(&timer) : *tempo;
+    if(difftime(timer, *tempo) >= 1.5)
+    {
+        time(tempo);
+        return true;
+    }else{
+        return false;
+    }
+}
 
 int main(){
 
@@ -44,24 +61,26 @@ int main(){
 
 	const char* windowName = "Webcam Feed";
     namedWindow(windowName, WINDOW_AUTOSIZE);
-    double angulo_x, angulo_y, constante_magica_x, constante_magica_y;
-    double unidade_x, unidade_y, dummy_x, dummy_y;
-    double s;
+    int flag = 3, flagAnterior = 0;
+    time_t timer, tempo;
+    bool enable = false;
+    double constante_magica_x, constante_magica_y;
+    double unidade_x;
     retangulo = (getWindowImageRect("Webcam Feed"));
-    unidade_x = retangulo.width / 90.0;
-    unidade_y = retangulo.height / 22.5;
-    string coordenadaX = "90,0", coordenadaY = "0,0";
-    Point centro_janela(retangulo.x + (retangulo.width / 2), retangulo.y + (retangulo.height / 2));
+    unidade_x = retangulo.width / 9.0;
     constante_magica_x = retangulo.x;
     constante_magica_y = retangulo.y;
+    char charArray_1[8] = {'1','3','5',',','0','0','\n'};
+    char charArray_2[8] = {'1','2','3',',','7','5','\n'};
+    char charArray_3[8] = {'1','1','2',',','5','0','\n'};
+    char charArray_4[8] = {'1','0','1',',','2','5','\n'};
+    char charArray_5[7] = {'9','0',',','0','0','\n'};
+    char charArray_6[7] = {'7','8',',','7','5','\n'};
+    char charArray_7[7] = {'6','7',',','5','0','\n'};
+    char charArray_8[7] = {'5','6',',','2','5','\n'};
+    char charArray_9[7] = {'4','5',',','0','0','\n'};
 
-    cout << centro_janela.x << "\n" << centro_janela.y << endl;
-    cout << constante_magica_x << endl;
-    cout << constante_magica_y << endl;
-    cout << unidade_x << "," << unidade_y << endl;
-    cout<< "[" << retangulo.tl().x << "," << retangulo.tl().y << "]" <<  "[" << retangulo.br().x << "," << retangulo.br().y << "]" << endl;
-
-    while(1){ //  como n tera nenhum arduino contigo deixa isso while 1 para funcionar para os teus testes
+     while(arduino.isConnected()){
 
         Mat frame;
 		bool bSuccess = cap.read(frame);
@@ -79,36 +98,73 @@ int main(){
             rectangle(frame, Point(cvRound(area.x * scale), cvRound(area.y * scale)), Point(cvRound((area.x + area.width - 1)*scale), cvRound((area.y + area.height - 1)*scale)), drawColor);
 
             Point centro(scale * (area.x + (area.width / 2)) + constante_magica_x, scale * (area.y + (area.height / 2)) + constante_magica_y);
-            cout << "[" << centro.x << "," << centro.y << "]" << endl;
 
+            flagAnterior = flag;
 
+            flag = (constante_magica_x <= centro.x && centro.x < (constante_magica_x + unidade_x))? 1 :
+                        ((constante_magica_x + unidade_x) <= centro.x && centro.x < (constante_magica_x + (2 * unidade_x)))? 2 :
+                            ((constante_magica_x + (2 * unidade_x)) <= centro.x && centro.x < (constante_magica_x + (3 * unidade_x)))? 3 :
+                                ((constante_magica_x + (3 * unidade_x)) <= centro.x && centro.x < (constante_magica_x + (4 * unidade_x)))? 4 :
+                                    ((constante_magica_x + (4 * unidade_x)) <= centro.x && centro.x < (constante_magica_x + (5 * unidade_x)))? 5 :
+                                       ((constante_magica_x + (5 * unidade_x)) <= centro.x && centro.x < (constante_magica_x + (6 * unidade_x)))? 6 :
+                                           ((constante_magica_x + (6 * unidade_x)) <= centro.x && centro.x < (constante_magica_x + (7 * unidade_x)))? 7 :
+                                               ((constante_magica_x + (6 * unidade_x)) <= centro.x && centro.x < (constante_magica_x + (8 * unidade_x)))? 8 : 9;
 
-            angulo_x = 90 - (centro.x - centro_janela.x) / unidade_x;
-            s = 5.625 -(centro.y - centro_janela.y)/unidade_y;
-            angulo_y = (s >= 0)? s : 0;
-
-
-
-                dummy_x = (int)angulo_x;
-                dummy_y = (int)angulo_y;
-                coordenadaX = to_string(dummy_x);
-                coordenadaY = to_string(dummy_y);
-
-            string command = coordenadaX + " " + coordenadaY;
-
-            cout << command << endl;
-
-            char *charArray = new char[command.size()+1];
-
-            copy(command.begin(),command.end(),charArray);
-            charArray[command.size()] = '\n';
-
-            arduino.writeSerialPort(charArray,MAX_DATA_LENGTH);
-            arduino.readSerialPort(output,MAX_DATA_LENGTH);
-
-             delete charArray;
-
-
+            enable = envio(flag, flagAnterior, timer, &tempo);
+            if(enable)
+            {
+                switch(flag)
+                {
+                    case 1:
+                        arduino.writeSerialPort(charArray_1,MAX_DATA_LENGTH);
+                        cout << charArray_1 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 2:
+                        arduino.writeSerialPort(charArray_2,MAX_DATA_LENGTH);
+                        cout << charArray_2 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 3:
+                        arduino.writeSerialPort(charArray_3,MAX_DATA_LENGTH);
+                        cout << charArray_3 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 4:
+                        arduino.writeSerialPort(charArray_4,MAX_DATA_LENGTH);
+                        cout << charArray_4 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 5:
+                        arduino.writeSerialPort(charArray_5,MAX_DATA_LENGTH);
+                        cout << charArray_5 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 6:
+                        arduino.writeSerialPort(charArray_6,MAX_DATA_LENGTH);
+                        cout << charArray_6 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 7:
+                        arduino.writeSerialPort(charArray_7,MAX_DATA_LENGTH);
+                        cout << charArray_7 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 8:
+                        arduino.writeSerialPort(charArray_8,MAX_DATA_LENGTH);
+                        cout << charArray_8 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    case 9:
+                        arduino.writeSerialPort(charArray_9,MAX_DATA_LENGTH);
+                        cout << charArray_9 << endl;
+                        arduino.readSerialPort(output,MAX_DATA_LENGTH);
+                        break;
+                    default:
+                        cout << "Ocorreu umm erro inesperado, por favor, reinicie o  programa." << endl;
+                        break;
+                }
+            }
         }
 
         if (!bSuccess) {
