@@ -2,9 +2,7 @@
     Programmers: Yvson Nunes
                  Isaac Nobrega:
                  Miguel Elias
-
     30/03/2020
-
 */
 
 #include <iostream>
@@ -61,7 +59,7 @@ int main(){
 
 	const char* windowName = "Webcam Feed";
     namedWindow(windowName, WINDOW_AUTOSIZE);
-    int flag = 3, flagAnterior = 0;
+    int flag = 5, flagAnterior = 0;
     time_t timer, tempo;
     bool enable = false;
     double constante_magica_x, constante_magica_y;
