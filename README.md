@@ -17,3 +17,5 @@ https://drive.google.com/file/d/1hq2FR_1ShWW31F17uoKjIBnaZOjayKGb/view?usp=shari
 INTEGRANTES:
 
 Miguel Elias Silva Rodrigues, 20190018853.
+Yvson Nunes Figueiredo, 20190019716.
+Isaac Nobrega Marinho, 20190021071.
