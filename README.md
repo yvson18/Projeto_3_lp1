@@ -13,3 +13,7 @@ E por fim, através da biblioteca SerialPort os dados dos ângulos em formato de
 
 O link abaixo leva a um vídeo que mostra o codigo e a estrutura montada em funcionamento:
 https://drive.google.com/file/d/1hq2FR_1ShWW31F17uoKjIBnaZOjayKGb/view?usp=sharing
+
+INTEGRANTES:
+
+Miguel Elias Silva Rodrigues, 20190018853.
